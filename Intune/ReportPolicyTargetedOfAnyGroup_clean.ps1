@@ -68,8 +68,18 @@ function Get_GraphURL($URL)
 
 function Get_ConfigurationPolicyOfGroupID($GroupID)
 {
-    $curgroup = invoke-MSGraphRequest -HttpMethod GET -Url "https://graph.microsoft.com/beta/groups/$GroupID"
-    $curgroupName = $curgroup.displayName
+    Try
+    {
+        $curgroup = invoke-MSGraphRequest -HttpMethod GET -Url "https://graph.microsoft.com/beta/groups/$GroupID"
+        $curgroupName = $curgroup.displayName
+    }
+    Catch 
+    {
+        Write-Host("Group not exist: " + $GroupID)
+        Read-Host 'Please use correct Group ID, press enter to exit...'
+        exit 1
+    }
+    
     
     $DeviceConfigURL = "https://graph.microsoft.com/beta/deviceManagement/deviceConfigurations"
     $DeviceConfigList = Get_GraphURL($DeviceConfigURL)
@@ -253,8 +263,17 @@ function Get_ConfigurationPolicyOfGroupID($GroupID)
 
 function Get_CompliancePolicyOfGroupID($GroupID)
 {
-    $curgroup = invoke-MSGraphRequest -HttpMethod GET -Url "https://graph.microsoft.com/beta/groups/$GroupID"
-    $curgroupName = $curgroup.displayName
+    Try
+    {
+        $curgroup = invoke-MSGraphRequest -HttpMethod GET -Url "https://graph.microsoft.com/beta/groups/$GroupID"
+        $curgroupName = $curgroup.displayName
+    }
+    Catch 
+    {
+        Write-Host("Group not exist: " + $GroupID)
+        Read-Host 'Please use correct Group ID, press enter to exit...'
+        exit 1
+    }
 
     $DeviceComplianceURL = "https://graph.microsoft.com/beta/deviceManagement/deviceCompliancePolicies"
     $DeviceComplianceList = Get_GraphURL($DeviceComplianceURL)
@@ -348,8 +367,17 @@ function Get_CompliancePolicyOfGroupID($GroupID)
 
 function Get_ManagedDeviceAppConfigPolicyOfGroupID($GroupID)
 {
-    $curgroup = invoke-MSGraphRequest -HttpMethod GET -Url "https://graph.microsoft.com/beta/groups/$GroupID"
-    $curgroupName = $curgroup.displayName
+    Try
+    {
+        $curgroup = invoke-MSGraphRequest -HttpMethod GET -Url "https://graph.microsoft.com/beta/groups/$GroupID"
+        $curgroupName = $curgroup.displayName
+    }
+    Catch 
+    {
+        Write-Host("Group not exist: " + $GroupID)
+        Read-Host 'Please use correct Group ID, press enter to exit...'
+        exit 1
+    }
 
     $ManagedDeviceAppConfigPolicyURL = "https://graph.microsoft.com/beta/deviceAppManagement/mobileAppConfigurations"
     $ManagedDeviceAppConfigPolicyList = Get_GraphURL($ManagedDeviceAppConfigPolicyURL)
@@ -444,8 +472,17 @@ function Get_ManagedDeviceAppConfigPolicyOfGroupID($GroupID)
 
 function Get_ManagedAppAppConfigPolicyOfGroupID($GroupID)
 {
-    $curgroup = invoke-MSGraphRequest -HttpMethod GET -Url "https://graph.microsoft.com/beta/groups/$GroupID"
-    $curgroupName = $curgroup.displayName
+    Try
+    {
+        $curgroup = invoke-MSGraphRequest -HttpMethod GET -Url "https://graph.microsoft.com/beta/groups/$GroupID"
+        $curgroupName = $curgroup.displayName
+    }
+    Catch 
+    {
+        Write-Host("Group not exist: " + $GroupID)
+        Read-Host 'Please use correct Group ID, press enter to exit...'
+        exit 1
+    }
 
     $ManagedAppAppConfigPolicyURL = "https://graph.microsoft.com/beta/deviceAppManagement/targetedManagedAppConfigurations"
     $ManagedAppAppConfigPolicyList = Get_GraphURL($ManagedAppAppConfigPolicyURL)
@@ -539,8 +576,17 @@ function Get_ManagedAppAppConfigPolicyOfGroupID($GroupID)
 
 function Get_AppProtectionPolicyOfGroupID($GroupID)
 {
-    $curgroup = invoke-MSGraphRequest -HttpMethod GET -Url "https://graph.microsoft.com/beta/groups/$GroupID"
-    $curgroupName = $curgroup.displayName
+    Try
+    {
+        $curgroup = invoke-MSGraphRequest -HttpMethod GET -Url "https://graph.microsoft.com/beta/groups/$GroupID"
+        $curgroupName = $curgroup.displayName
+    }
+    Catch 
+    {
+        Write-Host("Group not exist: " + $GroupID)
+        Read-Host 'Please use correct Group ID, press enter to exit...'
+        exit 1
+    }
 
     $MAMiOSURL = "https://graph.microsoft.com/beta/deviceAppManagement/iosManagedAppProtections"
     $MAMAndroidURL = "https://graph.microsoft.com/beta/deviceAppManagement/androidManagedAppProtections"
@@ -895,7 +941,7 @@ function main
 
     $SummaryReport = $ConfigReport + $ComplianceReport + $ManagedDeviceAppConifgReport + $ManagedAppAppConifgReport + $AppProtectionReport
 
-    $SummaryReport | Export-Csv -Path "$inputReportPath\PolicyAssignmentReport.csv"
+    $SummaryReport | Export-Csv -Path "$inputReportPath\PolicyAssignmentReportofGroup.csv"
     
     $SummaryReport | Format-Table
 
