@@ -940,7 +940,11 @@ function main
     $AppProtectionReport = Get_AppProtectionPolicyOfGroupID($inputgroupID)
 
     $SummaryReport = $ConfigReport + $ComplianceReport + $ManagedDeviceAppConifgReport + $ManagedAppAppConifgReport + $AppProtectionReport
-
+    if (-Not $SummaryReport)
+    {
+        Read-Host 'No policy target for this group. Press Enter to exit…'
+        exit 0
+    }
     $SummaryReport | Export-Csv -Path "$inputReportPath\PolicyAssignmentReportofGroup.csv"
     
     $SummaryReport | Format-Table
