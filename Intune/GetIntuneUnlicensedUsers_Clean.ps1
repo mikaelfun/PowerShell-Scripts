@@ -1,4 +1,15 @@
-﻿Connect-MsolService
+﻿<#
+This script is used to get the users without Intune license across the tenant.
+Based on graph API: 
+Get-MsolUser
+$user.Licenses.ServiceStatus.ServicePlan.ServiceName
+
+Author:
+Kun Fang
+
+#>
+
+Connect-MsolService
  
 $users = Get-MsolUser
 $IntuneunlicensedUsers = @()
