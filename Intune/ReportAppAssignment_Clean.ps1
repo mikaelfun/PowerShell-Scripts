@@ -77,10 +77,12 @@ function Get_ApplicationAssignmentStatus
     
     foreach ($eachApp in $AppList.value)
     {
-        $Result = "" | Select AppName,AppType,TargetGroup,Intent
-
         $AppID = $eachApp.id
-        
+        if ($eachApp.displayName -eq "Azure Information Protection")
+        {
+            echo "hi"
+        }
+
         $AssignmentURL = "https://graph.microsoft.com/beta/deviceAppManagement/mobileApps/$AppID/assignments"
         $allAssignment = Get_GraphURL($AssignmentURL)
         
@@ -89,23 +91,41 @@ function Get_ApplicationAssignmentStatus
             Write-Host("Error calling graph: '$AssignmentURL'")
             exit 1
         }
-
+        $Result = "" | Select AppName,AppType,TargetGroup,Intent,Mode
         if ($allAssignment.value)
         {
             foreach ($eachAssignment in $allAssignment.value)
             {
-                if ($eachAssignment.target.'@odata.type' -eq "#microsoft.graph.allLicensedUsersAssignmentTarget") #all user
+                $Result = "" | Select AppName,AppType,TargetGroup,Intent,Mode
+                if ($eachAssignment.target.'@odata.type' -eq "#microsoft.graph.exclusionGroupAssignmentTarget") #exclusion takes precedence
+                {
+                    $groupid = $eachAssignment.target.groupId
+                    $GroupURL = "https://graph.microsoft.com/beta/groups/$groupid"
+                    $thisGroup = Get_GraphURL($GroupURL)
+        
+                    if ($thisGroup -eq $null)
+                    {
+                        Write-Host("Error calling graph: '$GroupURL'")
+                        exit 1
+                    }
+
+                    $Result.TargetGroup = $thisGroup.displayName
+                    $Result.Mode = "Exclude"
+                }
+                elseif ($eachAssignment.target.'@odata.type' -eq "#microsoft.graph.allLicensedUsersAssignmentTarget") #all user
                 {
                     $Result.TargetGroup = "All User"
+                    $Result.Mode = "Include"
                 }
                 elseif ($eachAssignment.target.'@odata.type' -eq "#microsoft.graph.allDevicesAssignmentTarget") #all device
                 {
                     $Result.TargetGroup = "All Device"
+                    $Result.Mode = "Include"
                 }
                 elseif ($eachAssignment.target.'@odata.type' -eq "#microsoft.graph.groupAssignmentTarget") #group based
                 {
                     $groupid = $eachAssignment.target.groupId
-                    $GroupURL = "https://graph.microsoft.com/v1.0/groups/$groupid"
+                    $GroupURL = "https://graph.microsoft.com/beta/groups/$groupid"
                     $thisGroup = Get_GraphURL($GroupURL)
         
                     if ($allAssignment -eq $null)
@@ -115,10 +135,13 @@ function Get_ApplicationAssignmentStatus
                     }
 
                     $Result.TargetGroup = $thisGroup.displayName
+                    $Result.Mode = "Include"
                 }
                 else
                 {
+                    Write-Host("Unknown Assignment type!!")
                     $Result.TargetGroup = "Unknown"
+                    $Result.Mode = "Unknown"
                     $eachApp.displayName
                     $eachAssignment.target.'@odata.type'
                 }
@@ -134,6 +157,7 @@ function Get_ApplicationAssignmentStatus
             $Result.AppType = $eachApp.'@odata.type'.Substring(17)
             $Result.TargetGroup = "NA"
             $Result.Intent = "NA"
+            $Result.Mode = "NA"
             $Output += $Result
         }
         $curIndex ++
