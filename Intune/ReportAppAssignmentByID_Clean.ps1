@@ -74,8 +74,6 @@ function Get_ApplicationAssignmentStatusbyID($AppID)
     $Output = @()
     $curIndex = 0
     
-    
-    $Result = "" | Select AppName,AppType,TargetGroup,Intent
 
         
     $AssignmentURL = "https://graph.microsoft.com/beta/deviceAppManagement/mobileApps/$AppID/assignments"
@@ -91,14 +89,31 @@ function Get_ApplicationAssignmentStatusbyID($AppID)
     {
         foreach ($eachAssignment in $allAssignment.value)
         {
-            $Result = "" | Select AppName,AppType,TargetGroup,Intent
-            if ($eachAssignment.target.'@odata.type' -eq "#microsoft.graph.allLicensedUsersAssignmentTarget") #all user
+            $Result = "" | Select AppName,AppType,TargetGroup,Intent,Mode
+            if ($eachAssignment.target.'@odata.type' -eq "#microsoft.graph.exclusionGroupAssignmentTarget") #exclusion takes precedence
+            {
+                $groupid = $eachAssignment.target.groupId
+                $GroupURL = "https://graph.microsoft.com/beta/groups/$groupid"
+                $thisGroup = Get_GraphURL($GroupURL)
+        
+                if ($thisGroup -eq $null)
+                {
+                    Write-Host("Error calling graph: '$GroupURL'")
+                    exit 1
+                }
+
+                $Result.TargetGroup = $thisGroup.displayName
+                $Result.Mode = "Exclude"
+            }
+            elseif ($eachAssignment.target.'@odata.type' -eq "#microsoft.graph.allLicensedUsersAssignmentTarget") #all user
             {
                 $Result.TargetGroup = "All User"
+                $Result.Mode = "Include"
             }
             elseif ($eachAssignment.target.'@odata.type' -eq "#microsoft.graph.allDevicesAssignmentTarget") #all device
             {
                 $Result.TargetGroup = "All Device"
+                $Result.Mode = "Include"
             }
             elseif ($eachAssignment.target.'@odata.type' -eq "#microsoft.graph.groupAssignmentTarget") #group based
             {
@@ -113,11 +128,13 @@ function Get_ApplicationAssignmentStatusbyID($AppID)
                 }
 
                 $Result.TargetGroup = $thisGroup.displayName
+                $Result.Mode = "Include"
             }
             else
             {
                 Write-Host("Unknown Assignment type!!")
                 $Result.TargetGroup = "Unknown"
+                $Result.Mode = "Unknown"
                 $App.displayName
                 $eachAssignment.target.'@odata.type'
             }
@@ -132,6 +149,7 @@ function Get_ApplicationAssignmentStatusbyID($AppID)
         $Result.AppName = $App.displayName
         $Result.AppType = $App.'@odata.type'.Substring(17)
         $Result.TargetGroup = "NA"
+        $Result.Mode = "NA"
         $Result.Intent = "NA"
         $Output += $Result
     }
