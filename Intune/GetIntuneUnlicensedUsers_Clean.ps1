@@ -7,6 +7,12 @@ $user.Licenses.ServiceStatus.ServicePlan.ServiceName
 Author:
 Kun Fang
 
+Modules needed:
+Install-Module MSOnline
+Install-Module AzureAD
+Import-Module AzureAD
+Import-Module MSOnline
+
 #>
 
 Connect-MsolService
