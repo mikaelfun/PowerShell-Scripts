@@ -78,10 +78,6 @@ function Get_ApplicationAssignmentStatus
     foreach ($eachApp in $AppList.value)
     {
         $AppID = $eachApp.id
-        if ($eachApp.displayName -eq "Azure Information Protection")
-        {
-            echo "hi"
-        }
 
         $AssignmentURL = "https://graph.microsoft.com/beta/deviceAppManagement/mobileApps/$AppID/assignments"
         $allAssignment = Get_GraphURL($AssignmentURL)

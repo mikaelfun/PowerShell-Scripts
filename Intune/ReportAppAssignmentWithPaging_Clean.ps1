@@ -1,7 +1,6 @@
 ﻿<#
 
-This script is used to display Intune application assignment status. 
-Added App ID, App creation date to distinguish apps with same name.
+This script is used to display Intune application assignment status.
 Based on graph URL: 
 https://graph.microsoft.com/beta/deviceAppManagement/mobileApps
 and 
@@ -65,18 +64,26 @@ function Get_GraphURL($URL)
 function Get_ApplicationAssignmentStatus
 {
     $AppListURL = "https://graph.microsoft.com/beta/deviceAppManagement/mobileApps"
-    $AppList = Get_GraphURL($AppListURL)
-    if ($AppList -eq $null)
+    $AppListPage = Get_GraphURL($AppListURL)
+    if ($AppListPage -eq $null)
     {
         Write-Host("Error calling graph: '$AppListURL'")
         exit 1
     }
+    $AppList = $AppListPage.value
+    $appNum = $AppListPage.value.Length
+    
+    while ($AppListPage.'@odata.nextLink')
+    {
+        $AppListPage = Get_GraphURL($AppListPage.'@odata.nextLink')
+        $AppList += $AppListPage.value
+        $appNum += $AppListPage.value.Length
+    }
 
     $Output = @()
     $curIndex = 0
-    $appNum = $AppList.value.Length
     
-    foreach ($eachApp in $AppList.value)
+    foreach ($eachApp in $AppList)
     {
         $AppID = $eachApp.id
         $AppCreateDate = $eachApp.createdDateTime
