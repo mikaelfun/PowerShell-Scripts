@@ -74,7 +74,6 @@ $CSVDevices = Import-Csv -Path $CSVPath -Header "Serialnumber"
 
 #all Autopilot devices
 $Allpersonaldevices = Get-IntuneManagedDevice |Where-Object {$_.managedDeviceOwnerType -eq "personal"} | Get-MSGraphAllPages | select id, managedDeviceOwnerType,serialNumber
-
  
 
 $matchdevice = filterDevicebyserialNumber -serialnumbers $CSVDevices -personalDevice $Allpersonaldevices| Sort-Object -Property id -Unique

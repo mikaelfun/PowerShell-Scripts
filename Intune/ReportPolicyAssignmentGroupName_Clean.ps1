@@ -41,26 +41,17 @@ function ConnectToGraph
 
 function Get_GraphURL($URL)
 {
-    $CallCount = 0
-    While ($CallCount -lt 30) 
+    for ($CallCount =0; $CallCount -lt 30; $CallCount++) 
     {
         Try # graph call will sometimes return 503 service unavailable due to dense requests.
         {
             $Response = invoke-MSGraphRequest -HttpMethod GET -Url $URL
-            if ($Response)
-            {
-                return $Response
-            }
+			return $Response
         }
         Catch 
         {
-            $CallCount++
-            if ($CallCount -ge 30)
-            {
-                Write-Host("Error calling graph: '$URL'")
-                return $null
-            }
-            else {Continue}
+			Write-Host($_)
+            Continue
         }
     }
     return $null
