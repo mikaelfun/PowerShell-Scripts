@@ -1,4 +1,5 @@
 
+
 <#PSScriptInfo
 
 .VERSION 1.0
@@ -65,7 +66,7 @@ Param()
 connect-MSGraph
 
 #Win32 app Id, you can find it in the address bar when accessing Win32 app on MEM portal like https://endpoint.microsoft.com/#blade/Microsoft_Intune_Apps/SettingsMenu/0/appId/{id}
-$WinAppId = Read-Host “Please put the Win32 app id”
+$WinAppId = Read-Host ï¿½Please put the Win32 app idï¿½
 
 $winAppConfiguraiton = @()
 
@@ -123,7 +124,6 @@ if($winAppConfiguraiton)
     {
         Write-Host "cannot find specific app"
     }
-
 
 
 
